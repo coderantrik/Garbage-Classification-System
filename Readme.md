@@ -91,6 +91,41 @@ These results demonstrate the feasibility of deep learning-based waste classific
 
 ## ▶️ How to Run the Application
 
-### 1️⃣ Install dependencies
+### Install dependencies
 ```bash
 pip install -r requirements.txt
+python app.py
+
+The Gradio interface will open automatically in your browser.
+Upload an image to receive the predicted waste category and disposal suggestion.
+
+**## Project Structure**
+
+Garbage-Classification-System/
+│
+├── app.py                    # Gradio-based inference app
+├── garbage_model.tflite      # Trained TFLite model
+├── README.md
+├── requirements.txt
+│
+├── training/
+│   ├── README.md             # Training explanation
+│   ├── model.py              # Xception model architecture
+│   └── train.py              # Training pipeline
+│
+└── .gitignore
+
+**##🌱 Environmental Impact##**
+
+By enabling automated and accurate waste segregation, this system supports:
+
+Reduced landfill overflow
+
+Improved recycling efficiency
+
+Safer handling of hazardous waste
+
+Smarter waste management in smart cities
+
+
+
