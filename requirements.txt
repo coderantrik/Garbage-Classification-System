@@ -1,0 +1,5 @@
+# Requirements for the image classification web application
+tensorflow>=2.14.0         # For loading .h5 or SavedModel models
+gradio>=3.40.0             # Frontend interface for image upload and display
+numpy>=1.25.0              # For array operations
+pillow>=10.0.0             # For image processing
