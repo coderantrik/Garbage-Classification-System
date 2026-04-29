@@ -1,20 +1,13 @@
 import gradio as gr
-import tensorflow as tf
 import numpy as np
 from PIL import Image
 import json
-from tensorflow.keras.applications.xception import preprocess_input
+from tensorflow.keras.models import load_model
 
 # ------------------------------
-# Load TFLite Model
+# Load SavedModel
 # ------------------------------
-model_path = "garbage2_model.tflite"
-
-interpreter = tf.lite.Interpreter(model_path=model_path)
-interpreter.allocate_tensors()
-
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
+model = load_model("garbage_model_tf")
 
 # ------------------------------
 # Load Class Mapping
@@ -23,38 +16,39 @@ with open("class_indices.json", "r") as f:
     class_indices = json.load(f)
 
 categories = {v: k for k, v in class_indices.items()}
-print("Class mapping:", categories)
+# print("Class mapping:", categories)
+
 # ------------------------------
 # Waste Suggestions
 # ------------------------------
 waste_suggestions = {
-    "paper": "♻️ Recycle or reuse as notepads.",
-    "cardboard": "📦 Reuse or recycle.",
-    "plastic": "🚯 Reduce usage and recycle.",
-    "metal": "🔧 Recycle via scrap dealers.",
-    "trash": "🗑️ Dispose properly.",
-    "battery": "⚡ Use e-waste centers.",
-    "shoes": "👟 Donate or recycle.",
-    "clothes": "👕 Donate or reuse.",
-    "green-glass": "🍾 Recycle.",
-    "brown-glass": "🍶 Reuse or recycle.",
-    "white-glass": "🥛 Handle carefully.",
-    "biological": "🌱 Compost."
+    "paper": "♻️ Recycle or reuse as notepads,  Avoid burning as it causes pollution.",
+    "cardboard": "📦 Reuse for storage or recycle at paper recycling centers.",
+    "plastic": "🚯 Reduce usage. Recycle bottles, containers, and use eco-bricks.",
+    "metal": "🔧 Send to scrap dealers for recycling. Can be melted & reused..",
+    "trash": "🗑️ Dispose properly in dry waste bins. Avoid mixing with recyclables.",
+    "battery": "⚡ Take to e-waste collection centers. Never throw in household bins.",
+    "shoes": "👟 Donate if wearable. Otherwise recycle materials where possible",
+    "clothes": "👕 Donate to NGOs or reuse as cleaning cloth. Recycle if damaged.",
+    "green-glass": "🍾 Recycle at glass collection centers. Can be remolded.",
+    "brown-glass": "🍶 Reuse bottles or recycle. Keep separate by color.",
+    "white-glass": "🥛 Reuse jars or recycle. Avoid breakage when disposing.",
+    "biological": "🌱 CoCompost food and organic waste. Avoid plastic mixing."
 }
 
 # ------------------------------
-# Preprocessing (MATCH TRAINING)
+# Preprocessing Function
 # ------------------------------
 def preprocess_image(img: Image.Image):
-    input_shape = input_details[0]['shape'][1:3]
-
     img = img.convert("RGB")
-    img = img.resize(tuple(input_shape))
+    img = img.resize((320, 320))
 
     img_array = np.array(img, dtype=np.float32)
-    img_array = preprocess_input(img_array)
 
+    
     img_array = np.expand_dims(img_array, axis=0)
+    
+
     return img_array
 
 # ------------------------------
@@ -64,22 +58,42 @@ def classify_garbage(img: Image.Image):
     try:
         img_array = preprocess_image(img)
 
-        interpreter.set_tensor(input_details[0]['index'], img_array)
-        interpreter.invoke()
+        # Debug: check input range
+        print("Input range:", img_array.min(), img_array.max())
 
-        output_data = interpreter.get_tensor(output_details[0]['index'])
+        # Model prediction
+        preds = model.predict(img_array)[0]
 
-        output_data = output_data / np.sum(output_data)
+        # Top-3 predictions
+        top_indices = preds.argsort()[-3:][::-1]
 
-        class_idx = int(np.argmax(output_data))
-        confidence = float(np.max(output_data))
+        top_results = [
+            f"{categories[i]} ({preds[i]*100:.2f}%)"
+            for i in top_indices
+        ]
 
+        # Best prediction
+        class_idx = top_indices[0]
+        confidence = float(preds[class_idx])
         class_name = categories[class_idx]
+
+        # Low confidence handling
+        if confidence < 0.4:
+            return (
+                " Low confidence prediction",
+                "Try a clearer image or better lighting"
+            )
+
         suggestion = waste_suggestions.get(class_name, "No suggestion available")
 
+        # Debug output
+        print("Prediction vector:", preds)
+        print("Top-3:", top_results)
+
         return (
-            f"🔍 Prediction: {class_name.capitalize()} ({confidence*100:.2f}%)",
-            f"💡 Suggestion: {suggestion}"
+            f" Prediction: {class_name.capitalize()} ({confidence*100:.2f}%)\n\n"
+            f"Top-3 Predictions:\n" + "\n".join(top_results),
+            f" Suggestion: {suggestion}"
         )
 
     except Exception as e:
@@ -91,8 +105,11 @@ def classify_garbage(img: Image.Image):
 iface = gr.Interface(
     fn=classify_garbage,
     inputs=gr.Image(type="pil"),
-    outputs=["text", "text"],
-    title="♻️ Garbage Classification System",
+    outputs=[
+        gr.Textbox(label="Prediction"),
+        gr.Textbox(label="Suggestion")
+    ],
+    title="♻️ AI-Powered Garbage Classification System",
     description="Upload waste image to classify and get disposal suggestion."
 )
 

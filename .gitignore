@@ -16,6 +16,7 @@ Thumbs.db
 # Large models
 *.h5
 *.tflite
+garbage_model_tf/
 
 # Kaggle cache
 input/
