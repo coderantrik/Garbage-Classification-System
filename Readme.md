@@ -6,7 +6,7 @@ An intelligent waste classification system leveraging **deep learning and transf
 
 ## 📌 Overview
 
-Rapid urbanization has led to a significant increase in municipal solid waste, making manual segregation inefficient and error-prone. This project proposes an **AI-driven garbage classification framework** based on the **Xception convolutional neural network**, trained on a publicly available Kaggle dataset. The trained model is optimized and deployed using **TensorFlow Lite**, enabling lightweight and efficient inference through a **Gradio-based interactive interface**.
+Rapid urbanization has led to a significant increase in municipal solid waste, making manual segregation inefficient and error-prone. This project proposes an **AI-driven garbage classification framework** based on the **Xception convolutional neural network**, trained on a publicly available Kaggle dataset. The trained model is optimized and deployed using **TensorFlow Savedmodel**, enabling lightweight and efficient inference through a **Gradio-based interactive interface**.
 
 ---
 
@@ -14,7 +14,7 @@ Rapid urbanization has led to a significant increase in municipal solid waste, m
 
 - Image-based waste classification into **12 garbage categories**
 - **Xception transfer learning** for high accuracy with limited training data
-- Lightweight **TensorFlow Lite** deployment for efficient inference
+- **TensorFlow Savemodel** deployment for efficient inference
 - **Gradio web interface** for real-time user interaction
 - Context-aware **waste disposal and recycling suggestions**
 - Modular and clean project structure (training + inference separation)
@@ -44,7 +44,7 @@ The system classifies waste into the following categories:
 
 1. **Image Input** – User uploads an image of waste  
 2. **Preprocessing** – Image resizing and normalization  
-3. **Model Inference** – Xception-based CNN (TensorFlow Lite)  
+3. **Model Inference** – Xception-based CNN (TensorFlow savedmodel)  
 4. **Prediction Output** – Waste category identification  
 5. **Recommendation Engine** – Sustainable disposal guidance  
 6. **User Interface** – Gradio-based web application  
@@ -56,7 +56,7 @@ The system classifies waste into the following categories:
 - **Architecture**: Xception (pretrained on ImageNet)
 - **Training Strategy**: Transfer learning with frozen base layers
 - **Dataset**: Kaggle Garbage Classification Dataset
-- **Image Size**: 224 × 224
+- **Image Size**: 230 × 230
 - **Optimizer**: Adam
 - **Loss Function**: Categorical Cross-Entropy
 - **Evaluation Metrics**:
@@ -82,7 +82,7 @@ These results demonstrate the feasibility of deep learning-based waste classific
 
 ## 💻 Deployment
 
-- **Inference Format**: TensorFlow Lite (`.tflite`)
+- **Inference Format**: TensorFlow  (`_tf`)
 - **Platform**: Local desktop deployment
 - **Interface**: Gradio web UI
 - **Hardware Requirement**: CPU-only (no GPU required)
@@ -104,7 +104,7 @@ Upload an image to receive the predicted waste category and disposal suggestion.
 Garbage-Classification-System/
 │
 ├── app.py                    # Gradio-based inference app
-├── garbage_model.tflite      # Trained TFLite model
+├── garbage_model_tf      # Trained TF model
 ├── README.md
 ├── requirements.txt
 │
