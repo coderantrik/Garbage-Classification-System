@@ -1,4 +1,4 @@
-# ♻️ AI-Powered Garbage Classification System
+# ♻️ AI-POWERED GARBAGE CLASSIFICATION SYSTEM FOR SUSTAINABLE WASTE MANAGEMENT
 
 An intelligent waste classification system leveraging **deep learning and transfer learning** to automatically identify garbage categories from images and provide **human-readable disposal recommendations**. The system is designed with a strong focus on **environmental sustainability**, **practical deployment**, and **edge-friendly inference**.
 
